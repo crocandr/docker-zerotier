@@ -6,4 +6,4 @@ RUN curl -L -o /tmp/zerotier-install.sh https://install.zerotier.com/ && bash /t
 COPY files/start.sh /opt/start.sh
 RUN chmod 755 /opt/start.sh
 
-
+ENTRYPOINT /opt/start.sh
