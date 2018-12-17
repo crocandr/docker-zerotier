@@ -3,8 +3,8 @@ version: '3'
 services:
   zerotier:
     image: croc/zerotier
-#    environment:
-#      - NETWORK_ID=9b............34
+    environment:
+      - NETWORK_ID=9b............34
 #      - ROUTES=10.10.12.0/23,10.147.20.115;10.10.14.0/23,10.147.20.220
     network_mode: host
     privileged: true
