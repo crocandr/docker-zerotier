@@ -1,3 +1,36 @@
 #!/bin/bash
 
-zerotier-one
+#zerotier-one
+supervisord -c /etc/supervisor/supervisord.conf
+
+[ ! -z $NETWORK_ID ] && { sleep 5; zerotier-cli join $NETWORK_ID || exit 1; }
+
+# waiting for Zerotier IP
+# why 2? because you have an ipv6 and an a ipv4 address by default if everything is ok
+IP_OK=0
+while [ $IP_OK -lt 2 ]
+do
+  ZTDEV=$( ip addr | grep -i zt | grep -i mtu | awk '{ print $2 }' | cut -f1 -d':' )
+  echo "Waiting for a ZeroTier IP on $ZTDEV interface... Accept the new host on my.zerotier.com"
+  IP_OK=$( ip addr show dev $ZTDEV | grep -i inet | wc -l )
+  sleep 5
+done
+
+# add route rules
+if [ ! -z $ROUTES ]
+then
+  for routeline in $( echo $ROUTES | sed "s@;@\n@g" )
+  do
+    ADDR="$( echo $routeline | cut -f1 -d',' )"
+    GW="$( echo $routeline | cut -f2 -d',' )"
+    if [ ! -z $ADDR ] && [ ! -z $GW ]
+    then
+      echo "adding route ... $ADDR via $GW"
+      ip route add "$ADDR" via "$GW"
+    fi
+  done
+  ip route
+fi
+
+# something that keep the container running
+tail -f /dev/null
