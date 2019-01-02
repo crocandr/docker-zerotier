@@ -35,7 +35,9 @@ docker-compose exec zerotier zerotier-cli join 565799d8f6bba354
 
 You can choose working mode on the web page. If you turn on bridge (mode) on the web site, you can create site2site vpn solution with some ZeroTier nodes easily.
 
-### docker-compose way
+### docker-compose way (recommended)
+
+This way is more quicker and simpler.
 
 Check my Github page for an example docker-compose.yml file.
 
