@@ -6,6 +6,8 @@ services:
     environment:
       - NETWORK_ID=9b............34
 #      - ROUTES=10.10.12.0/23,10.147.20.115;10.10.14.0/23,10.147.20.220
+    volumes:
+      - './config/route.list:/config/route.list:ro'
     network_mode: host
     privileged: true
     restart: always

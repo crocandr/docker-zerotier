@@ -16,7 +16,10 @@ do
   sleep 5
 done
 
+#
 # add route rules
+#  from variable
+#
 if [ ! -z $ROUTES ]
 then
   for routeline in $( echo $ROUTES | sed "s@;@\n@g" )
@@ -28,6 +31,32 @@ then
       echo "adding route ... $ADDR via $GW"
       ip route add "$ADDR" via "$GW"
     fi
+  done
+  ip route
+fi
+
+#
+# add route rules
+#  from file
+#
+if [ -e /config/route.list ]
+then
+  echo "Route file found: /config/route.list"
+  cat config/route.list | while read line
+  do  
+    for routeline in "$( echo $line | grep -iv '^#' )"
+    do
+      # if empty line found - skip this loop
+      [ -z "$routeline" ] && { continue; }
+
+      ADDR="$( echo $routeline | cut -f1 -d',' | cut -f1 -d' ' )"
+      GW="$( echo $routeline | cut -f2 -d',' | cut -f2 -d' '  )"
+      if [ ! -z $ADDR ] && [ ! -z $GW ]
+      then
+        echo "adding route ... $ADDR via $GW"
+        ip route add "$ADDR" via "$GW"
+      fi
+    done
   done
   ip route
 fi

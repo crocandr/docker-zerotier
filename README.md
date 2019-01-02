@@ -40,7 +40,8 @@ You can choose working mode on the web page. If you turn on bridge (mode) on the
 Check my Github page for an example docker-compose.yml file.
 
   - modify the `NETWORK_ID`
-  - modify the `ROUTES` and use `<Remote Network>,<Zerotier node IP>;<another network>,<another Zerotier node IP>` if you would like to use Site-to-Site function between the networks. But do not forget to add the routes to your router too!
+  - modify the `ROUTES` and use `<Remote Network>,<Zerotier node IP>;<another network>,<another Zerotier node IP>;...` if you would like to use Site-to-Site function between the networks. But do not forget to add the routes to your router too (because DHCP clients on LAN use default routes)!
+  - You can use `config/route.list` files for route rules too. Check the example file for format. 
 
 ```
 docker-compose up -d
