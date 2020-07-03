@@ -1,6 +1,6 @@
-FROM ubuntu:xenial
+FROM ubuntu:focal
 
-RUN apt-get update && apt-get install -y curl screen supervisor
+RUN apt-get update && apt-get install -y curl screen supervisor gnupg
 RUN curl -L -o /tmp/zerotier-install.sh https://install.zerotier.com/ && bash /tmp/zerotier-install.sh || exit 0
 
 COPY files/supervisor-zerotier.conf /etc/supervisor/conf.d
