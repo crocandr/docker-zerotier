@@ -51,8 +51,6 @@ jobs:
           DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
         run: |
           docker images
-          echo $DOCKERHUB_USER | base64 -w0 -i
-          echo $DOCKERHUB_PASS | base64 -w0 -i
           echo "$DOCKERHUB_PASS" | docker login --username=$DOCKERHUB_USER --password-stdin
           docker push croc/zerotier
           VERSION=$( docker images | grep -i croc/zerotier | awk '{ print $2 }' | grep -i '^[0-9]' | sort | uniq )
