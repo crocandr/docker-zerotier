@@ -1,0 +1,60 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Auto-CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" branch
+  push:
+    branches:
+  pull_request:
+    branches: [ "master" ]
+  schedule:
+    - cron: '00 5 * * 6' # every Sunday at 5:00
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+
+      # Runs a set of commands using the runners shell
+      - name: build container
+        run: |
+          # debug
+          ls -hal
+          # build container
+          docker build -t croc/zerotier .
+          docker images
+      - name: check and tag version
+        run: |
+          docker-compose up -d
+          echo "waiting for up..."
+          sleep 5
+          ZEROTIER_VERSION=$( docker exec -i $( docker-compose images | grep -i zerotier | awk '{ print $1 }' ) zerotier-cli -v )
+          echo -n "zerotier version: $ZEROTIER_VERSION"
+          [ ! -z $ZEROTIER_VERSION ] && { echo "Zerotier version NOT FOUND"; exit 1; }
+          docker tag croc/zerotier croc/zerotier:$ZEROTIER_VERSION
+          docker images | grep -i zerotier
+      - name: push container
+        env:
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_PASS: ${{ secrets.DOCKERHUB_PASS }}
+        run: |
+          docker images
+          echo $DOCKERHUB_USER | base64 -w0 -i
+          echo $DOCKERHUB_PASS | base64 -w0 -i
+          echo "$DOCKERHUB_PASS" | docker login --username=$DOCKERHUB_USER --password-stdin
+          docker push croc/zerotier
+          VERSION=$( docker images | grep -i croc/zerotier | awk '{ print $2 }' | grep -i '^[0-9]' | sort | uniq )
+          echo "Image version: $VERSION"
+          docker push croc/zerotier:$VERSION || { echo "version ($VERSION) image push error - arm64"; exit 1; }
