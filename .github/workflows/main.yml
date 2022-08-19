@@ -41,8 +41,8 @@ jobs:
           echo "waiting for up..."
           sleep 5
           ZEROTIER_VERSION=$( docker exec -i $( docker-compose images | grep -i zerotier | awk '{ print $1 }' ) zerotier-cli -v )
-          echo -n "zerotier version: $ZEROTIER_VERSION"
-          [ ! -z $ZEROTIER_VERSION ] && { echo "Zerotier version NOT FOUND"; exit 1; }
+          echo "Zerotier version: $ZEROTIER_VERSION"
+          [ -z "$ZEROTIER_VERSION" ] && { echo "Zerotier version NOT FOUND"; exit 1; }
           docker tag croc/zerotier croc/zerotier:$ZEROTIER_VERSION
           docker images | grep -i zerotier
       - name: push container
