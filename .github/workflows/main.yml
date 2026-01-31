@@ -8,9 +8,9 @@ on:
   push:
     branches:
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
   schedule:
-    - cron: '00 5 * * 6' # every Sunday at 5:00
+    - cron: "00 5 * * 6" # every Sunday at 5:00
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -37,10 +37,11 @@ jobs:
           docker images
       - name: check and tag version
         run: |
-          docker-compose up -d
+          TEST_CONTAINER_NAME=zerotier-test
+          docker run --rm -tid --name $TEST_CONTAINER_NAME croc/zerotier
           echo "waiting for up..."
           sleep 5
-          ZEROTIER_VERSION=$( docker exec -i $( docker-compose images | grep -i zerotier | awk '{ print $1 }' ) zerotier-cli -v )
+          ZEROTIER_VERSION=$( docker exec $TEST_CONTAINER_NAME zerotier-cli -v )
           echo "Zerotier version: $ZEROTIER_VERSION"
           [ -z "$ZEROTIER_VERSION" ] && { echo "Zerotier version NOT FOUND"; exit 1; }
           docker tag croc/zerotier croc/zerotier:$ZEROTIER_VERSION
